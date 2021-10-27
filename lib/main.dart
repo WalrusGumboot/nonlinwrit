@@ -14,7 +14,7 @@ Widget mainApp() {
       textTheme: GoogleFonts.interTextTheme()
     ),
 
-    home: HomeScreen(),
+    home: const HomeScreen(),
   );
 }
 
@@ -27,14 +27,15 @@ class Section {
 
   Section({required this.key, required this.title, required this.desc, this.selected = false});
 
-  void select()   {this.selected = true;}
-  void deselect() {this.selected = false;}
+  void select()   {selected = true;}
+  void deselect() {selected = false;}
   
 }
 
 
 
 class HomeScreen extends StatefulWidget {
+  @override
   HomeScreenState createState() => HomeScreenState();
 
   const HomeScreen({Key? key}) : super(key: key);
@@ -48,20 +49,21 @@ class HomeScreenState extends State<HomeScreen> {
     super.initState();
     sections = [
       Section(
-        key: ValueKey("test_section"),
+        key: const ValueKey("test_section"),
         title: "Test section", 
         desc: "This section is here to test out functionality.",
         //selected: true
       ),
       Section(
-        key: ValueKey("test_section_2"),
+        key: const ValueKey("test_section_2"),
         title: "Test section 2", 
         desc: "This section is here to test out functionality too."
       ),
       Section(
-        key: ValueKey("test_section_3"),
+        key: const ValueKey("test_section_3"),
         title: "Test section 3", 
-        desc: "This section is here to test out functionality as well, how lovely!"
+        desc: "This section is here to test out functionality as well, how lovely!",
+        selected: true
       ),
     ];
   }
@@ -73,7 +75,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Nonlinear Writing App", 
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24)),
       ),
@@ -173,14 +175,40 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                VerticalDivider(color: Colors.grey),
+                const VerticalDivider(color: Colors.grey),
 
                 //editing area
                 Flexible(
                   flex: 2,
                   child: Card(
                     child: Center(
-                      child: Text("lol")
+                      child: Builder( builder: (BuildContext context) {
+                        if (selectedSection != null) {
+                            return Column(
+                              children: [
+                                Row(children: [
+                                  Text(selectedSection.title, style: Theme.of(context).textTheme.headline5,),
+                                  TextButton(
+                                    child: Text("EDIT SECTION"),
+                                    onPressed: () {
+                                      //TODO: show editing dialog
+                                    },
+                                  )
+                                ],),
+                                Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      hintText: "Start writing!"
+                                    )
+                                  ),
+                                )
+                              ],
+                            );
+                          } else {
+                            return Text("Select a section to start writing!");
+                          }
+                      })
                     ),
                     color: Theme.of(context).primaryColorLight,
                   ),
@@ -193,29 +221,3 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-//if (selectedSection != null) {
-//   return Column(
-//     children: [
-//       Row(children: [
-//         Text(selectedSection.title, style: Theme.of(context).textTheme.headline5,),
-//         TextButton(
-//           child: Text("EDIT SECTION"),
-//           onPressed: () {
-//             //TODO: show editing dialog
-//           },
-//         )
-//       ],),
-//       Expanded(
-//         child: TextField(
-//           decoration: InputDecoration(
-//             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-//             hintText: "Start writing!"
-//           )
-//         ),
-//       )
-//     ],
-//   );
-// } else {
-//   return Text("Select a section to start writing!");
-// }
