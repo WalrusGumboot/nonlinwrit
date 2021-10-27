@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-//TODO: fix "Bad state: no element" bug
 void main() {
   runApp(mainApp());
 }
@@ -21,6 +20,7 @@ Widget mainApp() {
 class Section {
   String title    = "New Section";
   String desc     = "A newly created section which doesn't yet contain anything.";
+  String content  = "";
   bool   selected = false;
   
   late Key key;
@@ -29,7 +29,6 @@ class Section {
 
   void select()   {selected = true;}
   void deselect() {selected = false;}
-  
 }
 
 
@@ -40,6 +39,15 @@ class HomeScreen extends StatefulWidget {
 
   const HomeScreen({Key? key}) : super(key: key);
 }
+
+
+
+Section? possiblyGetSelectedSection(List<Section> s) {
+  /// Gets all sections from a list and returns either the selected one or null if there is no section selected.
+  if (s.any((element) => element.selected)) return s.firstWhere((element) => element.selected);
+  return null;
+}
+
 
 class HomeScreenState extends State<HomeScreen> {
   late List<Section> sections;
@@ -63,14 +71,13 @@ class HomeScreenState extends State<HomeScreen> {
         key: const ValueKey("test_section_3"),
         title: "Test section 3", 
         desc: "This section is here to test out functionality as well, how lovely!",
-        selected: true
       ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    Section? selectedSection = sections.firstWhere((element) => element.selected); //this might be null
+    Section? selectedSection = possiblyGetSelectedSection(sections); //this might be null
 
 
     return Scaffold(
@@ -99,11 +106,17 @@ class HomeScreenState extends State<HomeScreen> {
                           child: InkWell(
                             onTap: () {
                               List<Section> newSections = sections;
-                        
-                              for (Section s in newSections) {
-                                if (s.key != el.key) {s.deselect();}
+                              
+                              if (el.selected) {
+                                newSections[index].deselect();
+                              } else {
+                                for (Section s in newSections) {
+                                  if (s.key != el.key) {s.deselect();}
+                                }
+                                newSections[index].select();
                               }
-                              newSections[index].select();
+
+                              
                               setState(() {
                                 sections = newSections;
                               });
@@ -180,30 +193,48 @@ class HomeScreenState extends State<HomeScreen> {
                 //editing area
                 Flexible(
                   flex: 2,
-                  child: Card(
+                  child: Container(
                     child: Center(
                       child: Builder( builder: (BuildContext context) {
                         if (selectedSection != null) {
-                            return Column(
-                              children: [
-                                Row(children: [
-                                  Text(selectedSection.title, style: Theme.of(context).textTheme.headline5,),
-                                  TextButton(
-                                    child: Text("EDIT SECTION"),
-                                    onPressed: () {
-                                      //TODO: show editing dialog
-                                    },
-                                  )
-                                ],),
-                                Expanded(
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                      hintText: "Start writing!"
-                                    )
+                            return Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(selectedSection.title, style: Theme.of(context).textTheme.headline5,),
+                                      ElevatedButton(
+                                        child: Text("EDIT SECTION"),
+                                        onPressed: () {
+                                          //TODO: show editing dialog
+                                        },
+                                      )
+                                    ],
                                   ),
-                                )
-                              ],
+                                  Divider(
+                                    color: Colors.grey,
+                                  ),
+                                  Expanded(
+                                    child: TextField(
+                                      minLines: null,
+                                      maxLines: null,
+                                      expands: true,
+
+                                      textAlignVertical: TextAlignVertical.top,
+
+                                      decoration: InputDecoration(
+                                        fillColor: Colors.white,
+                                        filled: true,
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+                                        hintText: "Start writing!"
+                                        
+                                      )
+                                    ),
+                                  )
+                                ],
+                              ),
                             );
                           } else {
                             return Text("Select a section to start writing!");
