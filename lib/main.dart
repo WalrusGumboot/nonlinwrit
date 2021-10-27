@@ -10,7 +10,7 @@ Widget mainApp() {
     theme: ThemeData(
       primarySwatch: Colors.red,
       brightness: Brightness.light,
-      textTheme: GoogleFonts.interTextTheme()
+      textTheme: GoogleFonts.sourceSansProTextTheme()
     ),
 
     home: const HomeScreen(),
@@ -56,22 +56,22 @@ class HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     sections = [
-      Section(
-        key: const ValueKey("test_section"),
-        title: "Test section", 
-        desc: "This section is here to test out functionality.",
-        //selected: true
-      ),
-      Section(
-        key: const ValueKey("test_section_2"),
-        title: "Test section 2", 
-        desc: "This section is here to test out functionality too."
-      ),
-      Section(
-        key: const ValueKey("test_section_3"),
-        title: "Test section 3", 
-        desc: "This section is here to test out functionality as well, how lovely!",
-      ),
+      // Section(
+      //   key: const ValueKey("test_section"),
+      //   title: "Test section", 
+      //   desc: "This section is here to test out functionality.",
+      //   //selected: true
+      // ),
+      // Section(
+      //   key: const ValueKey("test_section_2"),
+      //   title: "Test section 2", 
+      //   desc: "This section is here to test out functionality too."
+      // ),
+      // Section(
+      //   key: const ValueKey("test_section_3"),
+      //   title: "Test section 3", 
+      //   desc: "This section is here to test out functionality as well, how lovely!",
+      // ),
     ];
   }
 
@@ -79,12 +79,16 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     Section? selectedSection = possiblyGetSelectedSection(sections); //this might be null
 
+    TextEditingController editSectionTitleCtrl = TextEditingController();
+    TextEditingController editSectionDescCtrl  = TextEditingController();
+    TextEditingController writtenTextCtrl      = TextEditingController();
+
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "Nonlinear Writing App", 
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24)),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24)),
       ),
       body: Center(
           child: Padding(
@@ -138,13 +142,23 @@ class HomeScreenState extends State<HomeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(el.title, style: Theme.of(context).textTheme.headline6!.apply(
-                                      color: el.selected ? Colors.white : Colors.black,
-                                      fontWeightDelta: el.selected ? 500 : 0
-                                    ),),
-                                    Text(el.desc, style: TextStyle(
-                                      color: el.selected ? Colors.white : Colors.black,
-                                    ),),
+                                    Flexible(
+                                      child: Text(
+                                        el.title, 
+                                        style: Theme.of(context).textTheme.headline6!.apply(
+                                          color: el.selected ? Colors.white : Colors.black,
+                                          fontWeightDelta: el.selected ? 500 : 0
+                                        ),
+                                        overflow: TextOverflow.fade,
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        el.desc, 
+                                        style: TextStyle(color: el.selected ? Colors.white : Colors.black),
+                                        overflow: TextOverflow.fade
+                                      ),
+                                    ),
                                   ],
                                 ),
                               )
@@ -166,7 +180,8 @@ class HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(color: Theme.of(context).primaryColor),
-                            color: Theme.of(context).primaryColorLight,
+                            //color: Theme.of(context).primaryColorLight,
+                            color: Colors.white
                           ),
                           child: Center(child: Icon(
                             Icons.add, 
@@ -197,27 +212,95 @@ class HomeScreenState extends State<HomeScreen> {
                     child: Center(
                       child: Builder( builder: (BuildContext context) {
                         if (selectedSection != null) {
+                            writtenTextCtrl.text      = selectedSection.content;
+
+                            editSectionTitleCtrl.text = selectedSection.title;
+                            editSectionDescCtrl.text  = selectedSection.desc;
+
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(selectedSection.title, style: Theme.of(context).textTheme.headline5,),
+                                      Flexible(
+                                        child: Text(
+                                          selectedSection.title, 
+                                          style: Theme.of(context).textTheme.headline5,
+                                          overflow: TextOverflow.ellipsis
+                                        )
+                                      ),
                                       ElevatedButton(
                                         child: Text("EDIT SECTION"),
                                         onPressed: () {
-                                          //TODO: show editing dialog
+                                          showDialog(
+                                            context: context, 
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: Text("Edit Section Info"),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    TextField(
+                                                      decoration: InputDecoration(
+                                                        hintText: "Title",
+                                                        border: OutlineInputBorder()
+                                                      ),
+                                                      controller: editSectionTitleCtrl
+                                                    ),
+                                                    SizedBox(height: 8),
+                                                    TextField(
+                                                      decoration: InputDecoration(
+                                                        hintText: "Description",
+                                                        border: OutlineInputBorder()
+                                                      ),
+                                                      controller: editSectionDescCtrl
+                                                    )
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.pop(context), 
+                                                    child: Text("CANCEL")
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        List<Section> newSections = sections;
+                                                        Section newElement = newSections.firstWhere((element) => element.selected);
+
+                                                        newElement.title = editSectionTitleCtrl.text;
+                                                        newElement.desc  = editSectionDescCtrl.text;
+
+                                                        sections = newSections;
+                                                      });
+
+
+
+                                                      Navigator.pop(context);
+
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        new SnackBar(content: Text("Updated the section information."))
+                                                      );
+                                                    }, 
+                                                    child: Text("SAVE")
+                                                  )
+                                                ],
+                                              );
+                                            });
                                         },
                                       )
                                     ],
                                   ),
                                   Divider(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                   Expanded(
                                     child: TextField(
+                                      controller: writtenTextCtrl,
+
                                       minLines: null,
                                       maxLines: null,
                                       expands: true,
@@ -225,13 +308,32 @@ class HomeScreenState extends State<HomeScreen> {
                                       textAlignVertical: TextAlignVertical.top,
 
                                       decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.all(8),
                                         fillColor: Colors.white,
                                         filled: true,
                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
                                         hintText: "Start writing!"
-                                        
                                       )
                                     ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      setState(() {
+                                        List<Section> newSections = sections;
+                                        Section newElement = newSections.firstWhere((element) => element.selected);
+
+                                        newElement.content = writtenTextCtrl.text;
+
+                                        sections = newSections;
+
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          new SnackBar(content: Text("Saved your precious work!"))
+                                        );
+                                      });
+                                    }, 
+                                    icon: Icon(Icons.save), 
+                                    label: Text("SAVE")
                                   )
                                 ],
                               ),
