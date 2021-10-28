@@ -51,24 +51,6 @@ Section? possiblyGetSelectedSection(List<Section> s) {
   return null;
 }
 
-enum PreferredFont {
-  serif,       // EB Garamond
-  sans_serif,  // Source Sans Pro
-  mono         // Fira Mono
-}
-
-TextStyle getStyle(PreferredFont f) {
-  switch (f) {
-    case PreferredFont.sans_serif:
-      return GoogleFonts.sourceSansPro();
-    case PreferredFont.serif:
-      return GoogleFonts.ebGaramond();
-    case PreferredFont.mono:
-      return GoogleFonts.firaMono();
-  }
-}
-
-
 class WritingScreenState extends State<WritingScreen> {
   late List<Section> sections;
 
@@ -103,14 +85,6 @@ class WritingScreenState extends State<WritingScreen> {
     TextEditingController editSectionDescCtrl  = TextEditingController();
     TextEditingController writtenTextCtrl      = TextEditingController();
 
-    PreferredFont font = PreferredFont.sans_serif;
-
-    void setFont(PreferredFont f) {
-      setState(() {
-        print("Setting font to $f, was $font");
-        font = f;
-      });
-    }
 
 
     return Scaffold(
@@ -125,86 +99,7 @@ class WritingScreenState extends State<WritingScreen> {
             icon: Icon(Icons.tune),
             tooltip: "Preferences",
             onPressed: () {
-              PreferredFont newFontInMain = font;
-              showDialog(context: context, builder: (context) {
-                return StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    
-                    // this function is defined inside of this builder so that
-                    // setState has the proper context
-                    Container fontSelection(PreferredFont f) {
-                      String fontName = "";
-
-                      switch (f) {
-                        case PreferredFont.mono:
-                          fontName = "Monospace";
-                          break;
-                        case PreferredFont.sans_serif:
-                          fontName = "Sans-serif";
-                          break;
-                        case PreferredFont.serif:
-                          fontName = "Serif";
-                          break;
-                        default:
-                      }
-                      
-                      return Container(
-                        child: Row(
-                          children: [
-                            Radio<PreferredFont>(
-                              groupValue: font,
-                              value: f,
-                              onChanged: (PreferredFont? newFont) {
-                                print(newFont);
-                                setState(() {
-                                  font = newFont!;
-                                  newFontInMain = newFont;
-                                });
-                              },
-                            ),
-                            Text(fontName, style: getStyle(f)),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return AlertDialog(
-                      title: Text("Preferences", style: Theme.of(context).textTheme.headline5),
-                      content: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(height: 1, width: 180),
-                          Text("Font", style: Theme.of(context).textTheme.headline6),
-                          fontSelection(PreferredFont.sans_serif),
-                          fontSelection(PreferredFont.serif),
-                          fontSelection(PreferredFont.mono),
-                        ],
-                      ),
-                      actions: [
-                        // TextButton(
-                        //   child: Text("CANCEL"),
-                        //   onPressed: () {Navigator.pop(context);},
-                        // ),
-                        ElevatedButton(
-                          child: Text("SAVE"),
-                          onPressed: () {
-                            setFont(newFontInMain);
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              new SnackBar(content: Text("Updated your preferences."))
-                            );
-                          },
-                        )
-                      ],
-                    );
-                  },
-                );
-              });
-              // setState(() {
-              //   font = newFontInMain;
-              //   print("Should have updated the font to $newFontInMain, was $font");
-              // });
+              
             }
           ),
           SizedBox(width: 20)
@@ -425,7 +320,6 @@ class WritingScreenState extends State<WritingScreen> {
                                       maxLines: null,
                                       expands: true,
 
-                                      style: getStyle(font),
 
                                       textAlignVertical: TextAlignVertical.top,
 
@@ -435,7 +329,6 @@ class WritingScreenState extends State<WritingScreen> {
                                         filled: true,
                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
                                         hintText: "Start writing!",
-                                        hintStyle: getStyle(font).apply(fontStyle: FontStyle.italic)
                                       )
                                     ),
                                   ),
@@ -453,7 +346,6 @@ class WritingScreenState extends State<WritingScreen> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           new SnackBar(content: Text("Saved your precious work!"))
                                         );
-                                        print(font);
                                       });
                                     }, 
                                     icon: Icon(Icons.save), 
