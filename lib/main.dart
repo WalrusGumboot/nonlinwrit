@@ -15,7 +15,7 @@ Widget mainApp() {
       textTheme: GoogleFonts.sourceSansProTextTheme()
     ),
 
-    home: const WritingScreen(),
+    home: WritingScreen(),
     
   );
 }
@@ -51,8 +51,23 @@ Section? possiblyGetSelectedSection(List<Section> s) {
   return null;
 }
 
+enum WrittenTextTheme {
+  light,
+  dark,
+  black
+}
+
+enum WrittenTextFont {
+  sansSerif,
+  serif,
+  mono
+}
+
 class WritingScreenState extends State<WritingScreen> {
   late List<Section> sections;
+
+  WrittenTextFont  currentFont  = WrittenTextFont.sansSerif;
+  WrittenTextTheme currentTheme = WrittenTextTheme.light;
 
   @override
   void initState() {
@@ -85,7 +100,23 @@ class WritingScreenState extends State<WritingScreen> {
     TextEditingController editSectionDescCtrl  = TextEditingController();
     TextEditingController writtenTextCtrl      = TextEditingController();
 
+    Color writingAreaColour;
+    Color writingTextColour;
 
+    switch (currentTheme) {
+      case WrittenTextTheme.light:
+        writingAreaColour = Colors.white;
+        writingTextColour = Colors.grey[800]!;
+        break;
+      case WrittenTextTheme.dark:
+        writingAreaColour = Colors.blueGrey[800]!;
+        writingTextColour = Colors.grey[100]!;
+        break;
+      case WrittenTextTheme.black:
+        writingAreaColour = Colors.black;
+        writingTextColour = Colors.white;
+        break;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +130,147 @@ class WritingScreenState extends State<WritingScreen> {
             icon: Icon(Icons.tune),
             tooltip: "Preferences",
             onPressed: () {
-              
+              showDialog(context: context, builder: (context) {
+                return AlertDialog(
+                  title: Text("Preferences"),
+                  content: StatefulBuilder(
+                    builder: (context, StateSetter updateDialogState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Text("Font"),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //   children: [
+                          //     Container(height: 50, width: 50, color: Colors.blue),
+                          //     Container(height: 50, width: 50, color: Colors.blue),
+                          //     Container(height: 50, width: 50, color: Colors.blue),
+                          //   ]
+                          // ),
+                          Text("Theme"),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    updateDialogState(() {
+                                      currentTheme = WrittenTextTheme.light;
+                                    });
+                                    setState(() {
+                                      currentTheme = WrittenTextTheme.light;                                        
+                                    });
+                                    
+                                  },
+                                  child: Container(
+                                    height: 50, 
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: currentTheme == WrittenTextTheme.light ?
+                                        Border.all(color: Theme.of(context).primaryColor, width: 3) :
+                                        Border.all(),
+                                      borderRadius: BorderRadius.circular(6)
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Aa",
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          color: Colors.grey[800],
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 6),
+                              Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    updateDialogState(() {
+                                      currentTheme = WrittenTextTheme.dark;
+                                    });
+                                    setState(() {
+                                      currentTheme = WrittenTextTheme.dark;                                        
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.blueGrey[800],
+                                      border: currentTheme == WrittenTextTheme.dark ?
+                                        Border.all(color: Theme.of(context).primaryColor, width: 3) :
+                                        Border.all(),
+                                      borderRadius: BorderRadius.circular(6)
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Aa",
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          color: Colors.grey[100],
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 6),
+                              Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    updateDialogState(() {
+                                      currentTheme = WrittenTextTheme.black;
+                                    });
+                                    setState(() {
+                                      currentTheme = WrittenTextTheme.black;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      border: currentTheme == WrittenTextTheme.black ?
+                                        Border.all(color: Theme.of(context).primaryColor, width: 3) :
+                                        Border.all(),
+                                      borderRadius: BorderRadius.circular(6)
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Aa",
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          color: Colors.white,
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]
+                          ),
+                        ],
+                      );
+                    }
+                  ),
+                  actions: [
+                    ElevatedButton(
+                      child: Text("SAVE"),
+                      onPressed: () {
+                        //TODO: save changes
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                );
+              }); 
             }
           ),
           SizedBox(width: 20)
@@ -112,7 +283,7 @@ class WritingScreenState extends State<WritingScreen> {
               children: [
                 //list with sections
                 Flexible(
-                  flex: 1,
+                  flex: 2,
                   child: ReorderableListView(
                     buildDefaultDragHandles: false,
                     children: List.generate(sections.length, (index) {
@@ -222,7 +393,7 @@ class WritingScreenState extends State<WritingScreen> {
 
                 //editing area
                 Flexible(
-                  flex: 2,
+                  flex: 5,
                   child: Container(
                     child: Center(
                       child: Builder( builder: (BuildContext context) {
@@ -323,12 +494,15 @@ class WritingScreenState extends State<WritingScreen> {
 
                                       textAlignVertical: TextAlignVertical.top,
 
+                                      style: TextStyle(color: writingTextColour),
+
                                       decoration: InputDecoration(
                                         contentPadding: EdgeInsets.all(8),
-                                        fillColor: Colors.white,
+                                        fillColor: writingAreaColour,
                                         filled: true,
                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
                                         hintText: "Start writing!",
+                                        hintStyle: TextStyle(color: writingTextColour, fontStyle: FontStyle.italic),
                                       )
                                     ),
                                   ),
@@ -346,6 +520,8 @@ class WritingScreenState extends State<WritingScreen> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           new SnackBar(content: Text("Saved your precious work!"))
                                         );
+
+                                        
                                       });
                                     }, 
                                     icon: Icon(Icons.save), 
