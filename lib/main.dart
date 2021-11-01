@@ -103,6 +103,8 @@ class WritingScreenState extends State<WritingScreen> {
     Color writingAreaColour;
     Color writingTextColour;
 
+    TextStyle writingTextFont;
+
     switch (currentTheme) {
       case WrittenTextTheme.light:
         writingAreaColour = Colors.white;
@@ -115,6 +117,18 @@ class WritingScreenState extends State<WritingScreen> {
       case WrittenTextTheme.black:
         writingAreaColour = Colors.black;
         writingTextColour = Colors.white;
+        break;
+    }
+
+    switch (currentFont) {
+      case WrittenTextFont.sansSerif:
+        writingTextFont = GoogleFonts.sourceSansPro();
+        break;
+      case WrittenTextFont.serif:
+        writingTextFont = GoogleFonts.ebGaramond();
+        break;
+      case WrittenTextFont.mono:
+        writingTextFont = GoogleFonts.robotoMono();
         break;
     }
 
@@ -139,15 +153,6 @@ class WritingScreenState extends State<WritingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Text("Font"),
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                          //     Container(height: 50, width: 50, color: Colors.blue),
-                          //     Container(height: 50, width: 50, color: Colors.blue),
-                          //     Container(height: 50, width: 50, color: Colors.blue),
-                          //   ]
-                          // ),
                           Text("Theme"),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -254,6 +259,107 @@ class WritingScreenState extends State<WritingScreen> {
                                   ),
                                 ),
                               ),
+                              
+                            ]
+                          ),
+
+
+
+                          Text("Font"),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    updateDialogState(() {
+                                      currentFont = WrittenTextFont.sansSerif;
+                                    });
+                                    setState(() {
+                                      currentFont = WrittenTextFont.sansSerif;
+                                    });
+                                    
+                                  },
+                                  child: Container(
+                                    height: 50, 
+                                    decoration: BoxDecoration(
+                                      border: currentFont == WrittenTextFont.sansSerif ?
+                                        Border.all(color: Theme.of(context).primaryColor, width: 3) :
+                                        Border.all(),
+                                      borderRadius: BorderRadius.circular(6)
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Aa",
+                                        style: GoogleFonts.sourceSansPro().merge(TextStyle(fontSize: 28))
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 6),
+                              Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    updateDialogState(() {
+                                      currentFont = WrittenTextFont.serif;
+                                    });
+                                    setState(() {
+                                      currentFont = WrittenTextFont.serif;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: currentFont == WrittenTextFont.serif ?
+                                        Border.all(color: Theme.of(context).primaryColor, width: 3) :
+                                        Border.all(),
+                                      borderRadius: BorderRadius.circular(6)
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Aa",
+                                        style: GoogleFonts.ebGaramond().merge(TextStyle(fontSize: 28))
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 6),
+                              Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    updateDialogState(() {
+                                      currentFont = WrittenTextFont.mono;
+                                    });
+                                    setState(() {
+                                      currentFont = WrittenTextFont.mono;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: currentFont == WrittenTextFont.mono ?
+                                        Border.all(color: Theme.of(context).primaryColor, width: 3) :
+                                        Border.all(),
+                                      borderRadius: BorderRadius.circular(6)
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Aa",
+                                        style: GoogleFonts.robotoMono().merge(TextStyle(fontSize: 28))
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              
                             ]
                           ),
                         ],
@@ -494,7 +600,7 @@ class WritingScreenState extends State<WritingScreen> {
 
                                       textAlignVertical: TextAlignVertical.top,
 
-                                      style: TextStyle(color: writingTextColour),
+                                      style: writingTextFont.apply(color: writingTextColour),
 
                                       decoration: InputDecoration(
                                         contentPadding: EdgeInsets.all(8),
