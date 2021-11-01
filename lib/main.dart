@@ -15,7 +15,7 @@ Widget mainApp() {
       textTheme: GoogleFonts.sourceSansProTextTheme()
     ),
 
-    home: WritingScreen(),
+    home: ChapterScreen(),
     
   );
 }
@@ -36,11 +36,11 @@ class Section {
 
 
 
-class WritingScreen extends StatefulWidget {
+class ChapterScreen extends StatefulWidget {
   @override
-  WritingScreenState createState() => WritingScreenState();
+  ChapterScreenState createState() => ChapterScreenState();
 
-  const WritingScreen({Key? key}) : super(key: key);
+  const ChapterScreen({Key? key}) : super(key: key);
 }
 
 
@@ -63,7 +63,9 @@ enum WrittenTextFont {
   mono
 }
 
-class WritingScreenState extends State<WritingScreen> {
+class ChapterScreenState extends State<ChapterScreen> {
+  String chapterTitle = "New Chapter";
+
   late List<Section> sections;
 
   WrittenTextFont  currentFont  = WrittenTextFont.sansSerif;
@@ -133,12 +135,53 @@ class WritingScreenState extends State<WritingScreen> {
     }
 
     return Scaffold(
+      drawer: Drawer(
+        child: Column(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text("Currently writing in:", style: TextStyle(color: Colors.white),),
+                      Text(chapterTitle, style: Theme.of(context).textTheme.headline5!.apply(color: Colors.white))
+                    ]
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: IconButton(onPressed: () {}, icon: Icon(Icons.edit), color: Colors.white)
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.view_array_outlined),
+              title: Text("Chapters"),
+            ),
+            ListTile(
+              leading: Icon(Icons.file_upload_outlined),
+              title: Text("Export document")
+            ),
+            ListTile(
+              leading: Icon(Icons.book_outlined),
+              title: Text("My library")
+            ),
+            ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text("Legal information"),
+            )
+          ],
+        )
+      ),
       appBar: AppBar(
         title: const Text(
           "Nonlinear Writing App", 
           style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24)
         ),
-        
         actions: [
           IconButton(
             icon: Icon(Icons.tune),
@@ -613,25 +656,31 @@ class WritingScreenState extends State<WritingScreen> {
                                     ),
                                   ),
                                   SizedBox(height: 8),
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      setState(() {
-                                        List<Section> newSections = sections;
-                                        Section newElement = newSections.firstWhere((element) => element.selected);
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("${writtenTextCtrl.text.split(" ").length - 1} words (${writtenTextCtrl.text.length} characters)"),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            List<Section> newSections = sections;
+                                            Section newElement = newSections.firstWhere((element) => element.selected);
 
-                                        newElement.content = writtenTextCtrl.text;
+                                            newElement.content = writtenTextCtrl.text;
 
-                                        sections = newSections;
+                                            sections = newSections;
 
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          new SnackBar(content: Text("Saved your precious work!"))
-                                        );
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              new SnackBar(content: Text("Saved your precious work!"))
+                                            );
 
-                                        
-                                      });
-                                    }, 
-                                    icon: Icon(Icons.save), 
-                                    label: Text("SAVE")
+                                            
+                                          });
+                                        }, 
+                                        icon: Icon(Icons.save), 
+                                        label: Text("SAVE")
+                                      ),
+                                    ],
                                   )
                                 ],
                               ),
